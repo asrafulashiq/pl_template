@@ -27,7 +27,6 @@ def main(params: DictConfig, *args, **kwargs):
     # Init PyTorch Lightning model ⚡
     lightning_model = hydra.utils.instantiate(params.system,
                                               hparams=params,
-                                              dm=dm,
                                               _recursive_=False)
 
     if params.ckpt is not None and params.ckpt != 'none':
