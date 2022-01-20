@@ -6,11 +6,8 @@ from pytorch_lightning.callbacks.base import Callback
 from utils.helper_slurm import get_argv
 import torch
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import RichProgressBar
 import argparse
-
-import cv2
-
-cv2.setNumThreads(0)  # otherwise cause issues in multi-worker loader
 
 
 def main(params: DictConfig, *args, **kwargs):
@@ -22,7 +19,7 @@ def main(params: DictConfig, *args, **kwargs):
     pl.seed_everything(params.seed, workers=True)
 
     # Init datamodule
-    dm = hydra.utils.instantiate(params.datamodule.instance)
+    dm = hydra.utils.instantiate(params.dataset.instance)
 
     # Init PyTorch Lightning model ⚡
     lightning_model = hydra.utils.instantiate(params.system,
@@ -45,6 +42,7 @@ def main(params: DictConfig, *args, **kwargs):
         hydra.utils.instantiate(callback_conf)
         for _, callback_conf in params["callbacks"].items()
     ] if "callbacks" in params and params.callbacks else []
+    callbacks.append(RichProgressBar())
 
     trainer = pl.Trainer.from_argparse_args(
         argparse.Namespace(**params.trainer),

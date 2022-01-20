@@ -1,8 +1,11 @@
 # type: ignore[override]
 from typing import Any, Callable
+import os
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
 from pl_bolts.transforms.dataset_normalizations import imagenet_normalization
+import torchvision
+import torchvision.transforms as transform_lib
 
 
 class ImagenetDataModule(LightningDataModule):
@@ -51,9 +54,9 @@ class ImagenetDataModule(LightningDataModule):
         transforms = self.train_transform(
         ) if self.train_transforms is None else self.train_transforms
 
-        dataset = torchvision.datasets.ImageNet(self.data_dir,
-                                                split="train",
-                                                transform=transforms)
+        dataset = torchvision.datasets.ImageFolder(os.path.join(
+            self.data_dir, "train"),
+                                                   transform=transforms)
         loader: DataLoader = DataLoader(
             dataset,
             batch_size=self.batch_size,
@@ -68,9 +71,9 @@ class ImagenetDataModule(LightningDataModule):
         transforms = self.val_transform(
         ) if self.val_transforms is None else self.val_transforms
 
-        dataset = torchvision.datasets.ImageNet(self.data_dir,
-                                                split="val",
-                                                transform=transforms)
+        dataset = torchvision.datasets.ImageFolder(os.path.join(
+            self.data_dir, "val"),
+                                                   transform=transforms)
         loader: DataLoader = DataLoader(
             dataset,
             batch_size=self.batch_size,
@@ -86,9 +89,9 @@ class ImagenetDataModule(LightningDataModule):
         transforms = self.val_transform(
         ) if self.test_transforms is None else self.test_transforms
 
-        dataset = torchvision.datasets.ImageNet(self.data_dir,
-                                                split="val",
-                                                transform=transforms)
+        dataset = torchvision.datasets.ImageFolder(os.path.join(
+            self.data_dir, "val"),
+                                                   transform=transforms)
         loader: DataLoader = DataLoader(
             dataset,
             batch_size=self.batch_size,

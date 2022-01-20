@@ -21,9 +21,16 @@ class LightningSystem(LightningModule):
 
     # ----------------------------------- init ----------------------------------- #
     def setup(self, stage):
-        if stage == 'fit' and self.trainer.world_size > 1:
-            num_proc = self.trainer.num_nodes * self.trainer.num_processes
-            self.hparams.optimizer.lr *= num_proc
+        if stage == 'fit':
+            if self.trainer.world_size > 1:
+                num_proc = self.trainer.num_nodes * self.trainer.num_processes
+            else:
+                num_proc = 1
+            self.hparams.optimizer.lr = (
+                self.hparams.base_lr * self.hparams.batch_size *
+                self.trainer.accumulate_grad_batches *
+                num_proc) / self.hparams.base_batch_size
+            print(f"Learning rate set to {self.hparams.optimizer.lr}")
 
     # --------------------------------- training --------------------------------- #
     @abc.abstractmethod
@@ -53,5 +60,3 @@ class LightningSystem(LightningModule):
             return [optimizer], [scheduler]
 
         return optimizer
-
-    # ----------------------------------- other ---------------------------------- #

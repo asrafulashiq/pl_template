@@ -7,8 +7,7 @@ import re
 import subprocess
 
 # NOTE reguster resolver for step lr scheduler, requires omegaconf: 2.1.0.dev26
-OmegaConf.register_new_resolver("multiply",
-                                lambda x, y: int(float(x) * float(y)))
+OmegaConf.register_resolver("multiply", lambda x, y: int(float(x) * float(y)))
 
 
 def get_git_revision_hash() -> str:

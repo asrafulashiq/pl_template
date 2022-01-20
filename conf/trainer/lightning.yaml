@@ -25,7 +25,6 @@ trainer:
   sync_batchnorm: true
   auto_scale_batch_size: null
   strategy: null
-  amp_level: "02"
   precision: 32
 
   progress_bar_refresh_rate: 5

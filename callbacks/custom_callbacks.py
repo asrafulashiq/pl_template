@@ -1,37 +1,16 @@
-from typing import MutableSequence, Optional, Union
+from typing import MutableSequence
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.distributed import rank_zero_only
 import os
 import shutil
 import math
-from pathlib import Path
-
 import torch
 
 
 class CheckpointCallback(pl.callbacks.ModelCheckpoint):
-    def __init__(self,
-                 dirpath: Optional[Union[str, Path]] = None,
-                 filename: Optional[str] = None,
-                 monitor: Optional[str] = None,
-                 verbose: bool = False,
-                 save_last: Optional[bool] = None,
-                 save_top_k: Optional[int] = None,
-                 save_weights_only: bool = False,
-                 mode: str = "auto",
-                 period: int = 1,
-                 **kwargs):
-        super().__init__(dirpath=dirpath,
-                         filename=filename,
-                         monitor=monitor,
-                         verbose=verbose,
-                         save_last=save_last,
-                         save_top_k=save_top_k,
-                         save_weights_only=save_weights_only,
-                         mode=mode,
-                         period=period)
 
-        self.save_every_n_epoch = kwargs['save_every_n_epoch']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def on_validation_end(self, trainer, pl_module):
         try:
@@ -41,15 +20,15 @@ class CheckpointCallback(pl.callbacks.ModelCheckpoint):
 
     @rank_zero_only
     def on_epoch_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
-        if trainer.current_epoch % self.period == 0 and pl_module.hparams.test is False:
+        if trainer.current_epoch % self.every_n_epochs == 0 and pl_module.hparams.test is False:
             last_filepath = os.path.join(self.dirpath, "last.ckpt")
-            self._save_model(trainer, last_filepath)
+            trainer.save_checkpoint(last_filepath, self.save_weights_only)
 
-        if (self.save_every_n_epoch is not None
-                and trainer.current_epoch % self.save_every_n_epoch == 0):
+        if (self.every_n_epochs is not None
+                and trainer.current_epoch % self.every_n_epochs == 0):
             _filepath = os.path.join(self.dirpath,
                                      f"epoch_{trainer.current_epoch}.ckpt")
-            self._save_model(trainer, _filepath)
+            trainer.save_checkpoint(_filepath, self.save_weights_only)
 
     @rank_zero_only
     def on_fit_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
@@ -89,6 +68,7 @@ def get_state_dict_for_key(key, state_dict):
 
 
 class LRScheduler(pl.Callback):
+
     def __init__(self,
                  initial_lr=0.03,
                  use_cosine_scheduler=False,

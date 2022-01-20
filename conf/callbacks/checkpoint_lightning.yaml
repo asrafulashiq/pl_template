@@ -10,4 +10,6 @@ callbacks:
     filename: "{epoch:03d}"
     dirpath: ${trainer.weights_save_path}
     verbose: true
+    save_on_train_epoch_end: true
+    every_n_epochs: 1
     # every_n_val_epochs: null
