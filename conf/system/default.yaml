@@ -1,0 +1,10 @@
+# @package _global_
+
+defaults:
+  - /optimizer: SGD
+  - /dataset: imagenet
+  - _self_
+
+system:
+  _target_: system.system_byol.LightningSystem
+  _recursive_: false
