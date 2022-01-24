@@ -21,6 +21,11 @@ def main(params: DictConfig, *args, **kwargs):
     # Init datamodule
     dm = hydra.utils.instantiate(params.dataset.instance)
 
+    # transform
+    dm.train_transforms = hydra.utils.instantiate(params.train_transform)
+    dm.val_transforms = hydra.utils.instantiate(params.val_transform)
+    dm.test_transforms = hydra.utils.instantiate(params.val_transform)
+
     # Init PyTorch Lightning model ⚡
     lightning_model = hydra.utils.instantiate(params.system,
                                               hparams=params,
@@ -42,7 +47,7 @@ def main(params: DictConfig, *args, **kwargs):
         hydra.utils.instantiate(callback_conf)
         for _, callback_conf in params["callbacks"].items()
     ] if "callbacks" in params and params.callbacks else []
-    callbacks.append(RichProgressBar())
+    # callbacks.append(RichProgressBar())
 
     trainer = pl.Trainer.from_argparse_args(
         argparse.Namespace(**params.trainer),

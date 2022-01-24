@@ -1,10 +1,20 @@
 # @package _global_
 
 defaults:
-  - /optimizer: SGD
   - /dataset: imagenet
   - _self_
 
 system:
   _target_: system.system_byol.LightningSystem
   _recursive_: false
+
+model_name: base
+batch_size: 64
+num_workers: 4
+# --------------------------------- backbone --------------------------------- #
+
+# --------------------------------- optimizer -------------------------------- #
+
+# --------------------------------- scheduler -------------------------------- #
+
+# ------------------------------ training params ----------------------------- #
