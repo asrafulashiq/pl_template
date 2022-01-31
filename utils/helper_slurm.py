@@ -62,10 +62,8 @@ SLURM_CMD = """#!/bin/bash
 
 
 export PYTHONFAULTHANDLER=1
-export SLURM_JOB_NODELIST=$(scontrol show hostnames $SLURM_JOB_NODELIST | tr '\\n' ' ')
-export SLURM_NODELIST=$SLURM_JOB_NODELIST
-slurm_nodes=$(scontrol show hostnames $SLURM_JOB_NODELIST)
-export MASTER_ADDRESS=$(echo $slurm_nodes | cut -d' ' -f1)
+master_addr=$(scontrol show hostnames "${SLURM_JOB_NODELIST}" | head -n 1)
+export MASTER_ADDR=${master_addr}
 
 {module}
 
