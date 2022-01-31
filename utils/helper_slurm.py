@@ -62,8 +62,8 @@ SLURM_CMD = """#!/bin/bash
 
 
 export PYTHONFAULTHANDLER=1
-master_addr=$(scontrol show hostnames "${SLURM_JOB_NODELIST}" | head -n 1)
-export MASTER_ADDR=${master_addr}
+master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
+export MASTER_ADDR=$master_addr
 
 {module}
 
